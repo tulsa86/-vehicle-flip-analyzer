@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A simple cash-cost calculator for evaluating vehicle flips.">
+  <title>Vehicle Flip Analyzer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="calculator.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<main>
+  <header><span class="eyebrow">YOUR NEXT DEAL, BY THE NUMBERS</span><h1>Vehicle Flip Analyzer<span>.</span></h1><p>Know your costs. Set your target. Find your buying limit.</p></header>
+  <div class="layout">
+    <form id="deal-form" novalidate>
+      <section class="card">
+        <h2><span class="step">01</span> Vehicle details</h2>
+        <div class="grid">
+          <label>Year<input name="year" type="number" min="1886" max="2100" step="1" placeholder="2015"></label>
+          <label>Make<input name="make" maxlength="80" placeholder="Toyota"></label>
+          <label>Model<input name="model" maxlength="80" placeholder="Camry"></label>
+          <label>Mileage<input name="mileage" type="number" min="0" max="10000000" step="1" placeholder="120000"></label>
+        </div>
+      </section>
+      <section class="card">
+        <h2><span class="step">02</span> Cash costs & resale</h2>
+        <p class="hint">USD · Enter out-of-pocket costs. Your own labor is excluded.</p>
+        <div class="grid">
+          <label>Purchase price ($)<input name="purchase" type="number" min="0" max="1000000000000" step="0.01" placeholder="0.00" required></label>
+          <label>Auction fees ($)<input name="fees" type="number" min="0" max="1000000000000" step="0.01" value="0" required></label>
+          <label>Transportation ($)<input name="transport" type="number" min="0" max="1000000000000" step="0.01" value="0" required></label>
+          <label>Parts / repairs ($)<input name="repairs" type="number" min="0" max="1000000000000" step="0.01" value="0" required></label>
+          <label>Miscellaneous costs ($)<input name="misc" type="number" min="0" max="1000000000000" step="0.01" value="0" required></label>
+          <label>Expected resale price ($)<input name="resale" type="number" min="0" max="1000000000000" step="0.01" placeholder="0.00" required></label>
+        </div>
+        <p class="note">Include paid outside labor, taxes, title charges, or selling fees in repairs or miscellaneous costs if they apply.</p>
+      </section>
+      <section class="card">
+        <h2><span class="step">03</span> Your deal targets</h2>
+        <div class="grid">
+          <label>Target profit ($)<input name="target" type="number" min="0" max="1000000000000" step="0.01" value="2000" required></label>
+          <label>Minimum ROI (%)<input name="minRoi" type="number" min="0" max="1000000000000" step="0.01" value="20" required></label>
+        </div>
+      </section>
+      <div class="actions"><button type="button" id="example">Load example</button><button type="reset" class="secondary">Clear deal</button><span>Updates as you type</span></div>
+    </form>
+    <aside>
+      <section class="card summary" aria-label="Deal analysis">
+        <div class="summary-top"><span class="eyebrow">DEAL SNAPSHOT</span><span id="badge" class="badge neutral">Awaiting inputs</span></div>
+        <h2 id="vehicle-name">Your vehicle</h2>
+        <p id="vehicle-mileage" class="hint">Add vehicle details to label your deal.</p>
+        <div id="results" aria-live="polite" aria-atomic="true">
+          <p id="status">Enter a purchase price and resale estimate to see your analysis.</p>
+          <div class="profit"><span>Expected gross profit</span><strong id="profit">—</strong></div>
+          <dl class="metrics">
+            <div><dt>Total cash invested</dt><dd id="invested">—</dd></div>
+            <div><dt>ROI on cash invested</dt><dd id="roi">—</dd></div>
+            <div><dt>Break-even sale price</dt><dd id="break-even">—</dd></div>
+          </dl>
+          <div class="buy-limit"><span>Maximum purchase price</span><strong id="max-purchase">—</strong><p id="limit-note">Your buying limit for the target profit.</p></div>
+        </div>
+      </section>
+      <section class="rules"><h3>How the assessment works</h3><p><b class="buy-text">Buy</b> · Positive profit meets your target and ROI meets your minimum.</p><p><b class="maybe-text">Maybe</b> · Positive profit, but one or both targets fall short, or ROI is undefined.</p><p><b class="pass-text">Pass</b> · Break-even or a loss.</p><p class="hint">Based on your estimates. Year and mileage label the vehicle; they do not change the calculations.</p></section>
+    </aside>
+  </div>
+  <footer>Your time is valuable. This calculator measures cash returns; it does not price your own labor. No data is sent or saved.</footer>
+</main>
+</body>
+</html>
