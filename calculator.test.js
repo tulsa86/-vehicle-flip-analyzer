@@ -29,3 +29,31 @@ test('currency arithmetic uses cents; exact thresholds qualify', () => {
 test('invalid cash inputs are rejected', () => {
   for (const purchase of [-1, NaN, Infinity, 1e13]) assert.throws(() => calculate({ ...example, purchase }));
 });
+test('two sale profits share the same cash investment, with cent precision', () => {
+  const r = calculate({ ...example, conservativeSaleValue: 6000.01, expectedSaleValue: 8500.02 });
+  assert.equal(r.conservativeProfit, -199.99); assert.equal(r.expectedProfit, 2300.02);
+  assert.equal(r.profit, r.expectedProfit); assert.equal(r.assessment, 'Buy');
+  assert.equal(r.maxPurchase, 4800.02); assert.equal(r.breakEven, 6200);
+});
+test('market value and vehicle details never add labor or change financial results', () => {
+  const base = { ...example, conservativeSaleValue: 7500, expectedSaleValue: 8500 };
+  assert.deepEqual(calculate(base), calculate({ ...base, marketValue: 50000, condition: 'Poor', labor: 9000 }));
+});
+test('zero expected sale overrides legacy resale and conservative sale can break even', () => {
+  const r = calculate({ ...example, expectedSaleValue: 0, conservativeSaleValue: 6200 });
+  assert.equal(r.expectedProfit, -6200); assert.equal(r.conservativeProfit, 0);
+  assert.equal(r.assessment, 'Pass');
+});
+test('invalid new valuation inputs are rejected', () => {
+  for (const key of ['expectedSaleValue', 'conservativeSaleValue', 'marketValue']) {
+    for (const value of [-1, NaN, Infinity, 1e13]) assert.throws(() => calculate({ ...example, [key]: value }));
+  }
+});
+test('both sale scenarios handle zero investment and conservative changes leave expected metrics intact', () => {
+  const values = { purchase: 0, fees: 0, transport: 0, repairs: 0, misc: 0, expectedSaleValue: 100, conservativeSaleValue: 50, target: 50, minRoi: 0 };
+  const r = calculate(values);
+  assert.equal(r.expectedProfit, 100); assert.equal(r.conservativeProfit, 50);
+  assert.equal(r.roi, null); assert.equal(r.breakEven, 0); assert.equal(r.assessment, 'Maybe');
+  const changed = calculate({ ...values, conservativeSaleValue: 0 });
+  assert.deepEqual({ ...changed, conservativeProfit: r.conservativeProfit }, r);
+});

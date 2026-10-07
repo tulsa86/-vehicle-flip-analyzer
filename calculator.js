@@ -1,10 +1,17 @@
 (function (root) {
   'use strict';
   function calculate(values) {
+    // Accept the original resale input for existing calculator callers.
+    values = { ...values, resale: values.expectedSaleValue ?? values.resale };
     const fields = ['purchase', 'fees', 'transport', 'repairs', 'misc', 'resale', 'target', 'minRoi'];
     for (const key of fields) {
       if (!Number.isFinite(values[key]) || values[key] < 0 || values[key] > 1e12) {
         throw new Error('Enter valid, nonnegative amounts (up to 1 trillion).');
+      }
+    }
+    for (const key of ['conservativeSaleValue', 'marketValue']) {
+      if (values[key] != null && (!Number.isFinite(values[key]) || values[key] < 0 || values[key] > 1e12)) {
+        throw new Error('Enter valid, nonnegative valuation amounts.');
       }
     }
     // Work in cents so ordinary currency inputs do not accumulate floating-point error.
@@ -18,7 +25,8 @@
     if (profit > 0) {
       assessment = profit >= cents('target') && roi !== null && roi >= values.minRoi ? 'Buy' : 'Maybe';
     }
-    return { invested: invested / 100, profit: profit / 100, roi, breakEven: invested / 100,
+    const conservativeProfit = values.conservativeSaleValue == null ? null : (cents('conservativeSaleValue') - invested) / 100;
+    return { expectedProfit: profit / 100, conservativeProfit, invested: invested / 100, profit: profit / 100, roi, breakEven: invested / 100,
       maxPurchase: maxPurchase / 100, otherCosts: otherCosts / 100, assessment };
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { calculate };
